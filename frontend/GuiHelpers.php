@@ -78,7 +78,17 @@ class GuiHelpers
                 break;
         }
     }
-
+	
+    public static function getStatistics($getId)
+    {
+                $result = $GLOBALS['PW_DB']->executeRaw('SELECT MAX(`key`) AS last_offline FROM `statistics` WHERE `series` = \'monitor'.$getId.'\' AND `value` =0 LIMIT 0 , 1');
+                if (isset($result[0]['last_offline'])) {
+                    return $result[0]['last_offline'];
+                }
+                return 0;
+                break;
+    }
+	
     public static function formatDateLong($timestamp)
     {
         if($timestamp == 0)
@@ -115,32 +125,6 @@ class GuiHelpers
         if(!isset($_GET['expand']) || $_GET['expand'] == $id || $_GET['expand'] == 'all')
             return true;
         return false;
-    }
-
-    public static function checkVersion()
-    {
-        $sock = @fsockopen('phpwatch.net', 80, $errno, $errstr, 5);
-        if(!$sock)
-        {
-            return array(false, '<p class="version-notice-bad">Request timed out.  Check <a
-            href="http://phpwatch.net" target="_new">here</a> for updates.');
-        }
-        $req  = "GET /version HTTP/1.1\r\n";
-        $req .= "Host: phpwatch.net\r\n";
-        $req .= "Connection: Close\r\n\r\n";    fwrite($sock, $req);
-
-        $resp = '';
-        while(!feof($sock))
-            $resp .= fread($sock, 1024);
-        fclose($sock);
-        $resp = explode("\r\n", $resp);
-        $resp = trim($resp[sizeof($resp) - 1]);
-
-        list($version, $date, $url) = explode('|', $resp);
-        if(strtolower(trim($version)) != strtolower(trim(PW2_VERSION)))
-            return array(false, '<p class="version-notice-bad">New version available <a href="' . $url . '"
-            target="_new">here</a></p>');
-        return array(true, 'Up to date');
     }
 }
 ?>

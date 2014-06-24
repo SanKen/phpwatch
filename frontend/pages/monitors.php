@@ -35,13 +35,13 @@
         switch($monitor->getStatus())
         {
             case STATUS_ONLINE :
-                p('<h2 class="online">Online</h2>');
+                p('<h2 class="online">ONLINE</h2>');
                 break;
             case STATUS_OFFLINE :
-                p('<h2 class="offline">Offline</h2>');
+                p('<h2 class="offline">OFFLINE</h2>');
                 break;
             case STATUS_PAUSED :
-                p('<h2 class="waiting">Paused</h2>');
+                p('<h2 class="waiting">PAUSED</h2>');
                 break;
             case STATUS_DOWNTIME :
                 p('<h2 class="waiting">Scheduled Downtime</h2>');
@@ -89,12 +89,20 @@
                 p('N/A');
             else
                 p(GuiHelpers::formatDateLong($monitor->getLastQuery()));
+        ?>		
+        </li>
+		<li><strong>Last Offline:</strong>
+        <?php 
+            if($monitor->getStatus() == STATUS_UNPOLLED)
+                p('N/A');
+            else
+                p(GuiHelpers::formatDateLong(GuiHelpers::getStatistics($monitor->getId())));
         ?>
         </li>
         <?php
             list($total, $week, $day) = Statistics::get('monitor' . $monitor->getId())
-        ?>
-        <li>
+        ?>        
+		<li>
             <strong>Uptime (Day):</strong> <?php p($day['total'] > 0 ? round(100 * $day['online'] / $day['total'], 2) . '% (' .
             $day['online'] . ' of ' . $day['total'] . ')' : 'N/A'); ?>
         </li>
